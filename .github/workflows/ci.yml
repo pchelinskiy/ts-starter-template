@@ -19,10 +19,10 @@ jobs:
         run: pnpm install
       - name: Check package updates
         run: |
-          UPDATES=$(pnpm run check-updates --silent || true)
-          if [ -n "$UPDATES" ]; then
+          OUTDATED=$(pnpm outdated --json)
+          if [ "$OUTDATED" != "{}" ] && [ -n "$OUTDATED" ]; then
             echo "There are outdated packages:"
-            echo "$UPDATES"
+            echo "$OUTDATED"
             exit 1
           fi
       - name: Lint
