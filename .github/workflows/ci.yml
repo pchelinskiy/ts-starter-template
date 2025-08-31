@@ -19,7 +19,7 @@ jobs:
         run: pnpm install
       - name: Check package updates
         run: |
-          UPDATES=$(pnpm run check-updates --silent)
+          UPDATES=$(pnpm run check-updates --silent || true)
           if [ -n "$UPDATES" ]; then
             echo "There are outdated packages:"
             echo "$UPDATES"
