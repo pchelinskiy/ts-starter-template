@@ -14,7 +14,6 @@
     "prettier:write": "prettier --parser typescript --write \"src/**/*.{ts,tsx}\"",
     "lint": "eslint \"src/**\"",
     "typecheck": "tsc --noEmit",
-    "check-updates": "ncu --jsonUpgraded",
     "test": "jest || echo 'No tests found, skipping'",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
