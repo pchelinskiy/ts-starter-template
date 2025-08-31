@@ -9,22 +9,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Node
+
+      - name: Setup Node with cache
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - uses: pnpm/action-setup@v4
+          cache: 'pnpm'
 
-      - name: Cache pnpm store
-        uses: actions/cache@v4
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
+      - uses: pnpm/action-setup@v4
 
       - name: Install dependencies
         run: pnpm install
+
       - name: Check package updates
         run: |
           OUTDATED=$(pnpm outdated --json || true)
@@ -33,10 +29,13 @@ jobs:
             echo "$OUTDATED"
             exit 1
           fi
+
       - name: Lint
         run: pnpm run lint
+
       - name: Prettier check
         run: pnpm run prettier:check
+
       - name: Type check
         run: pnpm run typecheck
 
@@ -45,24 +44,21 @@ jobs:
     needs: code-check
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Node
+
+      - name: Setup Node with cache
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - uses: pnpm/action-setup@v4
+          cache: 'pnpm'
 
-      - name: Cache pnpm store
-        uses: actions/cache@v4
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
+      - uses: pnpm/action-setup@v4
 
       - name: Install dependencies
         run: pnpm install
+
       - name: Ensure SWC cache folder exists
         run: mkdir -p node_modules/.cache
+
       - name: Cache SWC
         uses: actions/cache@v4
         with:
@@ -70,7 +66,9 @@ jobs:
           key: ${{ runner.os }}-swc-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-swc-
+
       - name: Build (prod)
         run: pnpm run build:prod
+
       - name: Run tests
         run: pnpm run test
