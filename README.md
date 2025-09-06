@@ -27,10 +27,6 @@ pnpm run start:dev	# Запуск dev-сборки через ts-node с watch
 ```
 
 ```shell
-pnpm run build:dev	# Запуск dev-сборки через nodemon + ts-node
-```
-
-```shell
 pnpm run build:prod	# Сборка проекта в dist с помощью SWC
 ```
 
