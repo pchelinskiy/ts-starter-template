@@ -1,0 +1,30 @@
+# Node.js
+node_modules
+dist
+coverage
+
+# Git & CI/CD
+.git
+.github
+.gitignore
+.husky
+.commitlintrc*
+.commitlint.config.*
+
+# IDE
+.vscode
+.idea
+
+# Logs
+*.log
+
+# System
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
