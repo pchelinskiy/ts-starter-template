@@ -1,9 +1,12 @@
 services:
   app:
+    container_name: app
+    hostname: app
     build:
       context: .
       dockerfile: Dockerfile.dev
-      volumes:
-        - ./src:/app/src
+    volumes:
+      - ./src:/app/src
+    restart: no
     ports:
       - '3000:3000'
