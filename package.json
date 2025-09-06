@@ -4,9 +4,7 @@
   "description": "",
   "main": "./index.ts",
   "scripts": {
-    "prepare": "husky init",
-    "start:dev": "pnpm run build:dev",
-    "build:dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
+    "prepare": "husky || true",
     "build:prod": "swc src -d dist --source-maps",
     "start:prod": "node dist/index.js",
     "prettier:base": "prettier --parser typescript",
