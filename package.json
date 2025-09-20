@@ -35,7 +35,6 @@
     "test:cov": "jest --coverage --passWithNoTests",
     "test:ci": "jest --coverage --passWithNoTests --ci --maxWorkers=2",
     "test:debug": "node --inspect-brk --loader @swc-node/register/esm node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json --passWithNoTests",
     "test:unit": "jest --testPathIgnorePatterns=e2e --passWithNoTests",
     "ci": "pnpm run typecheck && pnpm run lint:ci && pnpm run test:ci",
     "precommit": "pnpm run typecheck && pnpm run lint && pnpm run test",

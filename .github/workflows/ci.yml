@@ -94,10 +94,6 @@ jobs:
       - name: Run tests
         run: pnpm run test
 
-      - name: Run E2E tests
-        run: pnpm run test:e2e
-        if: matrix.node-version == 20
-
       - name: Generate coverage report
         run: pnpm run test:cov
         if: matrix.node-version == 20

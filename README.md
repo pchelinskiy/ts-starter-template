@@ -88,7 +88,6 @@ pnpm run start
 | `pnpm run test:watch` | Тесты в режиме наблюдения |
 | `pnpm run test:cov`   | Тесты с покрытием кода    |
 | `pnpm run test:ci`    | Тесты для CI окружения    |
-| `pnpm run test:e2e`   | End-to-end тесты          |
 
 ### 🔄 Утилиты
 
