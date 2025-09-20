@@ -1,32 +1,65 @@
 {
   "name": "ts-starter-template",
   "version": "1.0.0",
-  "description": "",
-  "main": "./index.ts",
+  "description": "TypeScript starter template with modern tooling",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
   "scripts": {
     "prepare": "husky || true",
-    "build:prod": "swc src -d dist --source-maps",
-    "start:dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
-    "start:prod": "node dist/index.js",
+    "build": "swc src -d dist --source-maps --delete-dir-on-start",
+    "build:prod": "pnpm run clean && pnpm run typecheck && swc src -d dist --source-maps --delete-dir-on-start",
+    "build:watch": "swc src -d dist --source-maps --watch",
+    "dev": "nodemon --watch 'src/**/*.ts' --exec 'node --loader @swc-node/register/esm' src/index.ts",
+    "start": "node dist/index.js",
+    "start:dev": "pnpm run dev",
+    "start:prod": "NODE_ENV=production node dist/index.js",
+    "clean": "rimraf dist coverage .eslintcache",
+    "clean:all": "pnpm run clean && rimraf node_modules",
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,md}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,md}\"",
     "prettier:base": "prettier --parser typescript",
-    "prettier:check": "prettier --parser typescript --list-different \"src/**/*.{ts,tsx}\"",
-    "prettier:write": "prettier --parser typescript --write \"src/**/*.{ts,tsx}\"",
-    "lint": "eslint \"src/**\"",
+    "prettier:check": "pnpm run format:check",
+    "prettier:write": "pnpm run format",
+    "lint": "eslint \"src/**/*.{ts,tsx}\" --cache",
+    "lint:fix": "eslint \"src/**/*.{ts,tsx}\" --fix --cache",
+    "lint:ci": "eslint \"src/**/*.{ts,tsx}\" --format=compact",
     "typecheck": "tsc --noEmit",
+    "typecheck:watch": "tsc --noEmit --watch",
     "test": "jest --passWithNoTests",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:watch": "jest --watch --passWithNoTests",
+    "test:cov": "jest --coverage --passWithNoTests",
+    "test:ci": "jest --coverage --passWithNoTests --ci --maxWorkers=2",
+    "test:debug": "node --inspect-brk --loader @swc-node/register/esm node_modules/.bin/jest --runInBand",
+    "test:e2e": "jest --config ./test/jest-e2e.json --passWithNoTests",
+    "test:unit": "jest --testPathIgnorePatterns=e2e --passWithNoTests",
+    "ci": "pnpm run typecheck && pnpm run lint:ci && pnpm run test:ci",
+    "precommit": "pnpm run typecheck && pnpm run lint && pnpm run test",
+    "prepush": "pnpm run ci",
+    "release:patch": "npm version patch && git push && git push --tags",
+    "release:minor": "npm version minor && git push && git push --tags",
+    "release:major": "npm version major && git push && git push --tags"
   },
-  "keywords": [],
+  "keywords": [
+    "typescript",
+    "nodejs",
+    "starter",
+    "template",
+    "swc",
+    "jest",
+    "eslint",
+    "prettier"
+  ],
   "author": "Pchelinsckiy",
   "license": "UNLICENSED",
   "packageManager": "pnpm@10.15.0",
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
-    "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.35.0",
     "@swc-node/register": "^1.11.1",
     "@swc/cli": "^0.7.8",
@@ -44,26 +77,84 @@
     "jest": "^30.1.3",
     "nodemon": "^3.1.10",
     "prettier": "^3.6.2",
+    "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.43.0"
   },
   "jest": {
+    "preset": "ts-jest/presets/default-esm",
+    "extensionsToTreatAsEsm": [
+      ".ts"
+    ],
     "moduleFileExtensions": [
       "js",
       "json",
       "ts"
     ],
     "rootDir": "src",
-    "testRegex": ".*\\.spec\\.ts$",
+    "testRegex": ".*\\.(spec|test)\\.ts$",
     "transform": {
-      "^.+\\.(t|j)s$": "@swc/jest"
+      "^.+\\.(t|j)s$": [
+        "@swc/jest",
+        {
+          "jsc": {
+            "target": "es2022",
+            "parser": {
+              "syntax": "typescript",
+              "decorators": true
+            },
+            "transform": {
+              "legacyDecorator": true,
+              "decoratorMetadata": true
+            }
+          },
+          "module": {
+            "type": "es6"
+          }
+        }
+      ]
     },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "**/*.(t|j)s",
+      "!**/*.d.ts",
+      "!**/index.ts",
+      "!**/*.spec.ts",
+      "!**/*.test.ts",
+      "!**/__tests__/setup.ts",
+      "!**/__e2e__/**"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
-  }
+    "coverageReporters": [
+      "text",
+      "lcov",
+      "html",
+      "json-summary"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 80,
+        "functions": 80,
+        "lines": 80,
+        "statements": 80
+      }
+    },
+    "testEnvironment": "node",
+    "setupFilesAfterEnv": [
+      "<rootDir>/__tests__/setup.ts"
+    ],
+    "moduleNameMapping": {
+      "^@/(.*)$": "<rootDir>/$1"
+    },
+    "testTimeout": 10000,
+    "testPathIgnorePatterns": [
+      "<rootDir>/__e2e__/"
+    ]
+  },
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "package.json"
+  ]
 }

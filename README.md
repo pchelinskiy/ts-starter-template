@@ -1,90 +1,249 @@
-# TS Starter Template
+# TypeScript Starter Template 🚀
 
-Базовый шаблон TypeScript проекта с настроенными:
+Современный шаблон TypeScript проекта с настроенными инструментами разработки и CI/CD.
 
-- Node.js + TypeScript
-- pnpm пакетным менеджером
-- ESLint + Prettier
-- Husky pre-commit и commit-msg хуки
-- GitHub Actions CI: lint, prettier, typecheck, тесты, проверка устаревших пакетов
-- SWC для быстрого билда
-- Jest для тестирования
+## 📦 Что включено
+
+- **TypeScript 5.x** с строгой конфигурацией
+- **pnpm** как пакетный менеджер
+- **SWC** для быстрой сборки и трансформации
+- **ESLint + Prettier** с настроенными правилами
+- **Jest** для тестирования с поддержкой TypeScript
+- **Husky** с pre-commit и commit-msg хуками
+- **Conventional Commits** через CommitLint
+- **GitHub Actions** CI/CD pipeline
+- **Nodemon** для разработки с hot reload
 
 ---
 
-## Установка
+## 🚀 Быстрый старт
 
-```shell
+### Установка зависимостей
+
+```bash
 pnpm install
 ```
 
-Скрипт prepare автоматически активирует Husky хуки.
+> Husky хуки активируются автоматически через `prepare` скрипт
 
-## Скрипты
+### Запуск в режиме разработки
 
-```shell
-pnpm run start:dev	# Запуск dev-сборки через ts-node с watch
+```bash
+pnpm run dev
 ```
 
-```shell
-pnpm run build:prod	# Сборка проекта в dist с помощью SWC
+### Сборка для продакшена
+
+```bash
+pnpm run build:prod
 ```
 
-```shell
-pnpm run start:prod	# Запуск собранного продакшен-билда (dist/index.js)
+### Запуск собранного приложения
+
+```bash
+pnpm run start
 ```
 
-```shell
-pnpm run lint	# ESLint проверка
+---
+
+## 📋 Доступные скрипты
+
+### 🔧 Разработка
+
+| Команда              | Описание                          |
+| -------------------- | --------------------------------- |
+| `pnpm run dev`       | Запуск с hot reload через nodemon |
+| `pnpm run start:dev` | Alias для `dev`                   |
+
+### 🏗️ Сборка
+
+| Команда                | Описание                      |
+| ---------------------- | ----------------------------- |
+| `pnpm run build`       | Быстрая сборка через SWC      |
+| `pnpm run build:prod`  | Продакшен сборка с проверками |
+| `pnpm run build:watch` | Сборка в режиме наблюдения    |
+
+### ▶️ Запуск
+
+| Команда               | Описание                     |
+| --------------------- | ---------------------------- |
+| `pnpm run start`      | Запуск собранного приложения |
+| `pnpm run start:prod` | Запуск в продакшен режиме    |
+
+### 🧹 Качество кода
+
+| Команда                 | Описание                  |
+| ----------------------- | ------------------------- |
+| `pnpm run lint`         | Проверка ESLint           |
+| `pnpm run lint:fix`     | Автоисправление ESLint    |
+| `pnpm run format`       | Форматирование Prettier   |
+| `pnpm run format:check` | Проверка форматирования   |
+| `pnpm run typecheck`    | Проверка типов TypeScript |
+
+### 🧪 Тестирование
+
+| Команда               | Описание                  |
+| --------------------- | ------------------------- |
+| `pnpm run test`       | Запуск всех тестов        |
+| `pnpm run test:watch` | Тесты в режиме наблюдения |
+| `pnpm run test:cov`   | Тесты с покрытием кода    |
+| `pnpm run test:ci`    | Тесты для CI окружения    |
+| `pnpm run test:e2e`   | End-to-end тесты          |
+
+### 🔄 Утилиты
+
+| Команда          | Описание                                  |
+| ---------------- | ----------------------------------------- |
+| `pnpm run clean` | Очистка dist и coverage                   |
+| `pnpm run ci`    | Полная проверка (typecheck + lint + test) |
+
+---
+
+## 🔧 Настройка среды разработки
+
+### Git настройки (для Windows)
+
+Для корректной работы с переносами строк на Windows:
+
+```bash
+git config --global core.autocrlf false
+git config --global core.eol lf
 ```
 
-```shell
-pnpm run prettier:check	# Проверка форматирования Prettier
+### VS Code настройки
+
+Создайте `.vscode/settings.json`:
+
+```json
+{
+  "files.eol": "\n",
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
+}
 ```
 
-```shell
-pnpm run prettier:write	# Исправление форматирования Prettier
+---
+
+## 📝 Conventional Commits
+
+Используйте стандарт Conventional Commits для сообщений коммитов:
+
+```
+feat: добавить новую функцию
+fix: исправить баг
+docs: обновить документацию
+style: изменения в форматировании
+refactor: рефакторинг кода
+test: добавить тесты
+chore: обновить зависимости
 ```
 
-```shell
-pnpm run typecheck	# Проверка типов TypeScript
+**Примеры:**
+
+- `feat: add user authentication`
+- `fix: resolve memory leak in data processing`
+- `docs: update API documentation`
+
+---
+
+## 🔄 CI/CD Pipeline
+
+GitHub Actions автоматически запускает:
+
+### На каждый Push/PR:
+
+- ✅ Проверка качества кода (ESLint, Prettier)
+- ✅ Проверка типов TypeScript
+- ✅ Запуск тестов на Node.js 18, 20, 22
+- ✅ Проверка безопасности зависимостей
+- ✅ Сборка проекта
+
+### Дополнительные проверки:
+
+- 🔍 Проверка устаревших пакетов
+- 🛡️ Сканирование безопасности (Trivy)
+- 🔄 Проверка циклических зависимостей
+
+---
+
+## 📁 Структура проекта
+
+```
+├── src/                    # Исходный код
+│   ├── index.ts           # Точка входа
+│   └── test/              # Утилиты для тестов
+├── dist/                  # Собранные файлы (gitignore)
+├── coverage/              # Отчеты покрытия (gitignore)
+├── .github/               # GitHub Actions
+├── .husky/                # Git хуки
+├── eslint.config.mjs      # Конфигурация ESLint
+├── .prettierrc           # Конфигурация Prettier
+├── tsconfig.json         # Конфигурация TypeScript
+├── .swcrc                # Конфигурация SWC
+├── nodemon.json          # Конфигурация Nodemon
+└── jest.config.js        # Конфигурация Jest
 ```
 
-```shell
-pnpm run test	# Запуск тестов (Jest), пропускает если тестов нет
+---
+
+## 🛠️ Кастомизация
+
+### Добавление зависимостей
+
+```bash
+# Рантайм зависимости
+pnpm add package-name
+
+# Dev зависимости
+pnpm add -D package-name
 ```
 
-```shell
-pnpm run test:watch	# Watch режим тестов
-```
+### Настройка линтера
 
-```shell
-pnpm run test:cov	# Сборка покрытия тестов
-```
+Отредактируйте `eslint.config.mjs` для изменения правил ESLint.
 
-```shell
-pnpm run test:debug	# Запуск тестов в debug режиме
-```
+### Настройка форматирования
 
-```shell
-pnpm run test:e2e	# E2E тесты с отдельным конфигом
-```
+Отредактируйте `.prettierrc` для изменения правил Prettier.
 
-## Настройка Husky и CommitLint
+### Настройка TypeScript
 
-- Husky хуки активируются через prepare скрипт.
-- Commit messages проверяются через @commitlint/config-conventional.
-- Для корректной работы коммитов используйте формат Conventional Commits:
-- Начать писать код в src/.
-- Настроить свои тесты, если требуется.
+Отредактируйте `tsconfig.json` для изменения настроек компиляции.
 
-## CI / GitHub Actions
+---
 
-При пуше или PR:
+## 🚀 Деплой
 
-- Проверка устаревших зависимостей (pnpm outdated)
-- ESLint
-- Prettier
-- TypeScript typecheck
-- SWC сборка (build:prod)
-- Тесты (Jest)
+Примеры деплоя для различных платформ:
+
+- **Vercel**: `vercel --prod`
+- **Netlify**: подключите GitHub репозиторий
+- **VPS**: используйте PM2 для управления процессами
+- **Docker**: используйте включенный Dockerfile
+
+---
+
+## 📄 Лицензия
+
+UNLICENSED - частный проект
+
+---
+
+## 🤝 Вклад в проект
+
+1. Создайте feature branch: `git checkout -b feature/amazing-feature`
+2. Коммитьте изменения: `git commit -m 'feat: add amazing feature'`
+3. Отправьте в branch: `git push origin feature/amazing-feature`
+4. Откройте Pull Request
+
+---
+
+**Счастливого кодинга! 🎉**

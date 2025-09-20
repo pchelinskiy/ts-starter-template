@@ -1,0 +1,37 @@
+{
+  "recommendations": [
+    // Основные расширения для TypeScript разработки
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "ms-vscode.vscode-typescript-next",
+
+    // Git интеграция
+    "eamodio.gitlens",
+    "donjayamanne.githistory",
+
+    // Тестирование
+    "orta.vscode-jest",
+    "hbenl.vscode-test-explorer",
+
+    // Утилиты разработки
+    "bradlc.vscode-tailwindcss",
+    "christian-kohler.path-intellisense",
+    "christian-kohler.npm-intellisense",
+    "ms-vscode.vscode-json",
+
+    // Markdown
+    "yzhang.markdown-all-in-one",
+    "davidanson.vscode-markdownlint",
+
+    // Docker (если используете)
+    "ms-azuretools.vscode-docker",
+
+    // Дополнительные утилиты
+    "gruntfuggly.todo-tree",
+    "aaron-bond.better-comments",
+    "usernamehw.errorlens",
+    "formulahendry.auto-rename-tag",
+    "ms-vscode.hexeditor"
+  ],
+  "unwantedRecommendations": ["ms-vscode.vscode-typescript"]
+}

@@ -1,4 +1,77 @@
 {
-  "eslint.validate": ["typescript", "javascript"],
-  "editor.formatOnSave": true
+  // Переносы строк - всегда LF (Unix)
+  "files.eol": "\n",
+
+  // Автоматически добавлять пустую строку в конец файла
+  "files.insertFinalNewline": true,
+
+  // Удалять пробелы в конце строк
+  "files.trimTrailingWhitespace": true,
+
+  // Автоматические действия при сохранении
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "explicit"
+  },
+
+  // Форматирование при сохранении
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+
+  // Prettier как основной форматтер
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  // Специфичные настройки для TypeScript
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit"
+    }
+  },
+
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  // Git настройки
+  "git.autofetch": true,
+  "git.confirmSync": false,
+
+  // ESLint настройки
+  "eslint.validate": ["javascript", "typescript"],
+  "eslint.run": "onSave",
+
+  // TypeScript настройки
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "typescript.suggest.autoImports": true,
+  "typescript.updateImportsOnFileMove.enabled": "always",
+
+  // Настройки редактора
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+
+  // Исключить из поиска
+  "search.exclude": {
+    "dist/**": true,
+    "coverage/**": true,
+    "node_modules/**": true,
+    "**/*.log": true
+  },
+
+  // Файлы для отслеживания
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/node_modules/**": true,
+    "**/dist/**": true,
+    "**/coverage/**": true
+  }
 }

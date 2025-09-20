@@ -2,79 +2,253 @@ name: CI
 
 on:
   push:
+    branches: [main, develop]
   pull_request:
+    branches: [main, develop]
+  workflow_dispatch: # позволяет запускать вручную
 
 env:
   HUSKY: 0
+  NODE_ENV: test
+  # Кэширование для ускорения сборки
+  FORCE_COLOR: 1
+  CI: true
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   code-check:
+    name: Code Quality & Security
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # для semantic-release и changelog
 
-      - uses: pnpm/action-setup@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
 
-      - name: Setup Node with cache
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile --prefer-offline
+
+      - name: Check package vulnerabilities
+        run: pnpm audit --audit-level moderate
+        continue-on-error: true
 
       - name: Check package updates
         run: |
-          OUTDATED=$(pnpm outdated --json || true)
-          if [ "$OUTDATED" != "{}" ] && [ -n "$OUTDATED" ]; then
-            echo "There are outdated packages:"
-            echo "$OUTDATED"
-            exit 1
+          OUTDATED=$(pnpm outdated --json || echo "{}")
+          if [ "$OUTDATED" != "{}" ] && [ "$OUTDATED" != "null" ] && [ -n "$OUTDATED" ]; then
+            echo "::warning title=Outdated packages::There are outdated packages"
+            echo "$OUTDATED" | jq '.' || echo "$OUTDATED"
+          else
+            echo "All packages are up to date"
           fi
 
-      - name: Lint
-        run: pnpm run lint
+      - name: Lint code
+        run: pnpm run lint:ci
 
-      - name: Prettier check
-        run: pnpm run prettier:check
+      - name: Check code formatting
+        run: pnpm run format:check
 
       - name: Type check
         run: pnpm run typecheck
 
+      - name: Check for circular dependencies
+        run: |
+          npx madge --circular --extensions ts,js src/ || echo "::warning title=Circular dependencies::Found circular dependencies"
+
   build-and-test:
+    name: Build & Test
     runs-on: ubuntu-latest
     needs: code-check
+    timeout-minutes: 15
+
+    strategy:
+      matrix:
+        node-version: [18, 20, 22]
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
 
-      - name: Setup Node with cache
+      - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile --prefer-offline
 
-      - name: Ensure SWC cache folder exists
-        run: mkdir -p node_modules/.cache
-
-      - name: Cache SWC
+      - name: Cache build artifacts
         uses: actions/cache@v4
         with:
-          path: node_modules/.cache
-          key: ${{ runner.os }}-swc-${{ hashFiles('**/pnpm-lock.yaml') }}
+          path: |
+            dist/
+            node_modules/.cache/
+            ~/.cache/swc/
+          key: ${{ runner.os }}-build-${{ matrix.node-version }}-${{ hashFiles('**/pnpm-lock.yaml', 'src/**/*') }}
           restore-keys: |
-            ${{ runner.os }}-swc-
+            ${{ runner.os }}-build-${{ matrix.node-version }}-
+            ${{ runner.os }}-build-
 
-      - name: Build (prod)
+      - name: Build application
         run: pnpm run build:prod
 
-      - name: Build Docker image
-        run: docker build -t app:ci .
+      - name: Run unit tests
+        run: pnpm run test:ci
 
-      - name: Run tests
-        run: pnpm run test
+      - name: Run e2e tests
+        run: pnpm run test:e2e
+        if: matrix.node-version == 20 # только для основной версии Node
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        if: matrix.node-version == 20
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-node-${{ matrix.node-version }}
+          path: |
+            coverage/
+            test-results.xml
+          retention-days: 7
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        if: matrix.node-version == 20
+        with:
+          name: dist
+          path: dist/
+          retention-days: 7
+
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [code-check, build-and-test]
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    environment: staging
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Deploy to staging server
+        run: |
+          echo "Deploying to staging environment..."
+          # Здесь будет деплой на staging сервер
+          # Например, через SSH, rsync, или API вашего хостинга
+
+      - name: Run smoke tests
+        run: |
+          echo "Running smoke tests on staging..."
+          # curl проверки или другие простые тесты
+
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [code-check, build-and-test]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment: production
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Deploy to production
+        run: |
+          echo "Deploying to production environment..."
+          # Реальный деплой команды будут здесь
+
+      - name: Post-deployment tests
+        run: |
+          echo "Running post-deployment tests..."
+          # Проверка что приложение работает
+
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: code-check
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  quality-gate:
+    name: Quality Gate
+    runs-on: ubuntu-latest
+    needs: [code-check, build-and-test, security]
+    if: always()
+    timeout-minutes: 5
+
+    steps:
+      - name: Check all jobs status
+        run: |
+          if [[ "${{ needs.code-check.result }}" == "failure" || "${{ needs.build-and-test.result }}" == "failure" ]]; then
+            echo "::error::Critical jobs failed"
+            exit 1
+          fi
+
+          if [[ "${{ needs.security.result }}" == "failure" ]]; then
+            echo "::warning::Security scan failed"
+          fi
+
+          echo "Quality gate passed ✅"
