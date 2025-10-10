@@ -1,67 +1,62 @@
-# Используем официальный Node.js образ как базовый
+# ---------- Базовый слой ----------
 FROM node:20-alpine AS base
 
-# Устанавливаем pnpm глобально
+# Включаем corepack и активируем pnpm
 RUN corepack enable && corepack prepare pnpm@10.15.0 --activate
 
-# Устанавливаем рабочую директорию
+# Рабочая директория
 WORKDIR /app
 
-# Копируем файлы package.json и pnpm-lock.yaml
+# Копируем файлы зависимостей
 COPY package.json pnpm-lock.yaml ./
 
-# Этап установки зависимостей
+# ---------- Установка зависимостей ----------
 FROM base AS deps
 
-# Устанавливаем зависимости
-RUN pnpm install --frozen-lockfile --prod=false
+# Устанавливаем все зависимости (dev + prod)
+RUN pnpm install --frozen-lockfile
 
-# Этап сборки
+# ---------- Сборка ----------
 FROM base AS builder
 
-# Копируем node_modules из этапа deps
+# Копируем установленные зависимости
 COPY --from=deps /app/node_modules ./node_modules
 
-# Копируем исходный код
+# Копируем исходники
 COPY . .
 
 # Собираем приложение
 RUN pnpm run build:prod
 
-# Устанавливаем только продакшен зависимости
-RUN pnpm install --frozen-lockfile --prod --ignore-scripts
+# Удаляем dev-зависимости, оставляем только prod
+RUN pnpm prune --prod --ignore-scripts && pnpm store prune
 
-# Продакшен этап
+# ---------- Финальный (runtime) слой ----------
 FROM node:20-alpine AS runner
 
-# Создаем пользователя для безопасности
+# Создаём непривилегированного пользователя
 RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 nextjs
+    adduser --system --uid 1001 app
 
 WORKDIR /app
 
-# Устанавливаем dumb-init для правильной обработки сигналов
+# Устанавливаем dumb-init для корректной обработки сигналов
 RUN apk add --no-cache dumb-init
 
-# Копируем собранное приложение и зависимости
-COPY --from=builder --chown=nextjs:nodejs /app/dist ./dist
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
+# Копируем собранное приложение и только прод-зависимости
+COPY --from=builder --chown=app:nodejs /app/dist ./dist
+COPY --from=builder --chown=app:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=app:nodejs /app/package.json ./package.json
 
 # Переключаемся на непривилегированного пользователя
-USER nextjs
+USER app
 
-# Экспонируем порт
-EXPOSE 3000
-
-# Устанавливаем переменные окружения
+# Порт и окружение
 ENV NODE_ENV=production
 ENV PORT=3000
 
-# Проверка здоровья контейнера
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD node --version || exit 1
+EXPOSE 3000
 
-# Запускаем приложение через dumb-init
-ENTRYPOINT ["dumb-init", "--"]
+# Точка входа
+ENTRYPOINT ["dumb-init"]
 CMD ["node", "dist/index.js"]
