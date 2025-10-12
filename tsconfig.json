@@ -1,54 +1,38 @@
 {
   "compilerOptions": {
-    // Module Resolution
     "module": "nodenext",
     "moduleResolution": "nodenext",
-    "target": "ES2022", // более стабильная версия чем esnext
-
-    // Type Checking
-    "strict": true, // включаем все строгие проверки
-    "noImplicitAny": true, // лучше включить для типобезопасности
+    "target": "ES2022",
+    "strict": true,
+    "noImplicitAny": true,
     "strictNullChecks": true,
     "strictFunctionTypes": true,
-    "strictBindCallApply": true, // лучше включить
+    "strictBindCallApply": true,
     "strictPropertyInitialization": true,
     "noImplicitThis": true,
     "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true, // лучше включить
-    "noUncheckedIndexedAccess": true, // дополнительная безопасность
-
-    // Emit
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
     "declaration": true,
-    "declarationMap": true, // для лучшей отладки
+    "declarationMap": true,
     "sourceMap": true,
     "outDir": "./dist",
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-
-    // Interop Constraints
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "isolatedModules": true, // важно для современных сборщиков
-
-    // Language and Environment
-    "baseUrl": "./",
-    "lib": ["ES2022", "DOM"], // добавляем DOM если нужен
-
-    // Projects
+    "isolatedModules": true,
+    "lib": ["ES2022"],
     "incremental": true,
-    "composite": true, // для project references
-
-    // Completeness
+    "composite": true,
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-
-    // Advanced
     "resolveJsonModule": true,
     "allowImportingTsExtensions": false,
     "noEmit": false,
-    "exactOptionalPropertyTypes": true // строгая проверка optional properties
+    "exactOptionalPropertyTypes": true
   },
   "include": ["src/**/*", "*.ts", "*.mts"],
   "exclude": ["node_modules", "dist", "coverage", "**/*.test.js", "**/*.spec.js", "src/__e2e__/jest.config.js"],
