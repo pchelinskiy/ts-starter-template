@@ -2,7 +2,7 @@
   "compilerOptions": {
     "module": "nodenext",
     "moduleResolution": "nodenext",
-    "target": "ES2022",
+    "target": "ESNext",
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
@@ -24,7 +24,6 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
-    "lib": ["ES2022"],
     "incremental": true,
     "composite": true,
     "skipLibCheck": true,
