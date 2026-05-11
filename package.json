@@ -14,7 +14,7 @@
     "build": "swc src -d dist --source-maps --delete-dir-on-start",
     "build:prod": "pnpm run clean && pnpm run typecheck && swc src -d dist --source-maps --delete-dir-on-start",
     "build:watch": "swc src -d dist --source-maps --watch",
-    "dev": "nodemon --watch 'src/**/*.ts' --exec \"node --import @swc-node/register/esm\" src/index.ts",
+    "dev": "nodemon --watch 'src/**/*.ts' src/index.ts",
     "start": "node dist/index.js",
     "start:dev": "pnpm run dev",
     "start:prod": "NODE_ENV=production node dist/index.js",

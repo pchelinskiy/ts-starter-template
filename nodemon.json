@@ -1,8 +1,8 @@
 {
   "watch": ["src"],
-  "ext": "ts,json",
-  "ignore": ["src/**/*.spec.ts", "src/**/*.test.ts"],
-  "exec": "node --loader @swc-node/register/esm src/index.ts",
+  "ext": "ts,json,html",
+  "ignore": ["**/*.spec.ts", "**/*.test.ts"],
+  "exec": "node --import @swc-node/register/esm src/index.ts",
   "env": {
     "NODE_ENV": "development"
   },
