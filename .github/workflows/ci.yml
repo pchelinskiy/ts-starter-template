@@ -27,11 +27,11 @@ jobs:
         with: { version: 10.15.0 }
       - uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 22
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: pnpm run typecheck
-      - run: pnpm run lint
+      - run: pnpm run lint:ci
       - run: pnpm run format:check
 
   build-and-test:
@@ -40,7 +40,7 @@ jobs:
     timeout-minutes: 15
     strategy:
       matrix:
-        node-version: [18, 20, 22]
+        node-version: [22, 24]
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v6
@@ -51,10 +51,8 @@ jobs:
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: pnpm run build:prod
-      - run: pnpm run test
-      - if: matrix.node-version == 20
-        run: pnpm run test:cov
-      - if: matrix.node-version == 20 && github.ref == 'refs/heads/main'
+      - run: pnpm run test:ci
+      - if: matrix.node-version == 22 && github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v6
         with:
           name: build-artifacts
@@ -73,7 +71,7 @@ jobs:
         with: { version: 10.15.0 }
       - uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 22
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: pnpm audit --audit-level=high || true
@@ -88,8 +86,8 @@ jobs:
           echo "Build & Test: ${{ needs.build-and-test.result }}"
           echo "Security Check: ${{ needs.security-check.result }}"
           if [[ "${{ needs.code-quality.result }}" == "failure" || "${{ needs.build-and-test.result }}" == "failure" ]]; then
-            echo "❌ CI Failed - Critical issues found"
+            echo "❌ CI Failed"
             exit 1
           else
-            echo "✅ CI Passed - All checks successful"
+            echo "✅ CI Passed"
           fi

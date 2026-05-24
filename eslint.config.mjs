@@ -10,13 +10,13 @@ export default defineConfig(
     ignores: [
       'eslint.config.mjs',
       'commitlint.config.mjs',
+      'vitest.config.ts',
       'dist/**',
       'node_modules/**',
       'coverage/**',
       '*.min.js',
       '.env*',
       'build/**',
-      'src/__e2e__/jest.config.js', // ← Игнорируем E2E конфиг
     ],
   },
   eslint.configs.recommended,
@@ -26,7 +26,6 @@ export default defineConfig(
     languageOptions: {
       globals: {
         ...globals.node,
-        ...globals.jest,
       },
       sourceType: 'module',
       parserOptions: {
@@ -38,9 +37,8 @@ export default defineConfig(
   },
   {
     rules: {
-      // TypeScript specific rules
-      '@typescript-eslint/no-explicit-any': 'warn', // лучше warn вместо off
-      '@typescript-eslint/no-floating-promises': 'error', // error вместо warn для критичных случаев
+      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/no-unsafe-argument': 'warn',
       '@typescript-eslint/no-unused-vars': [
         'error',
@@ -53,8 +51,6 @@ export default defineConfig(
       '@typescript-eslint/prefer-optional-chain': 'error',
       '@typescript-eslint/no-unnecessary-condition': 'warn',
       '@typescript-eslint/strict-boolean-expressions': 'warn',
-
-      // General code quality
       'no-console': 'warn',
       'no-debugger': 'error',
       'prefer-const': 'error',
@@ -62,8 +58,6 @@ export default defineConfig(
       'object-shorthand': 'error',
       'prefer-template': 'error',
       eqeqeq: ['error', 'always'],
-
-      // Import/Export rules
       'sort-imports': [
         'error',
         {
@@ -73,15 +67,12 @@ export default defineConfig(
           memberSyntaxSortOrder: ['none', 'all', 'multiple', 'single'],
         },
       ],
-
-      // Performance
       'no-await-in-loop': 'warn',
       'require-atomic-updates': 'error',
     },
   },
-  // Специфичные правила для тестов
   {
-    files: ['**/*.test.ts', '**/*.spec.ts', '**/__tests__/**/*.ts'],
+    files: ['**/*.test.ts', '**/*.spec.ts', '**/__tests__/**/*.ts', '**/__e2e__/**/*.ts'],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       'no-console': 'off',

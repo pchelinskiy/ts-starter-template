@@ -31,12 +31,11 @@
     "resolveJsonModule": true,
     "allowImportingTsExtensions": false,
     "noEmit": false,
-    "exactOptionalPropertyTypes": true
+    "exactOptionalPropertyTypes": true,
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
-  "include": ["src/**/*", "*.ts", "*.mts"],
-  "exclude": ["node_modules", "dist", "coverage", "**/*.test.js", "**/*.spec.js", "src/__e2e__/jest.config.js"],
-  "ts-node": {
-    "esm": true,
-    "experimentalSpecifierResolution": "node"
-  }
+  "include": ["src/**/*", "vitest.config.ts", "*.ts", "*.mts"],
+  "exclude": ["node_modules", "dist", "coverage", "**/*.test.js", "**/*.spec.js"]
 }
