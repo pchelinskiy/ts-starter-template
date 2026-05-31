@@ -47,7 +47,7 @@
   ],
   "author": "",
   "license": "UNLICENSED",
-  "packageManager": "pnpm@11.2.2",
+  "packageManager": "pnpm@11.5.0",
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",

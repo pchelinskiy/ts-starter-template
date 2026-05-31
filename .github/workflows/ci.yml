@@ -24,7 +24,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v6
-        with: { version: 11.2.2 }
       - uses: actions/setup-node@v6
         with:
           node-version: 22
@@ -44,7 +43,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v6
-        with: { version: 11.2.2 }
       - uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
@@ -68,13 +66,11 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v6
-        with: { version: 11.2.2 }
       - uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm audit --audit-level=high || true
+      - run: pnpm audit --audit-level=high
 
   summary:
     runs-on: ubuntu-latest
@@ -85,7 +81,7 @@ jobs:
           echo "Code Quality: ${{ needs.code-quality.result }}"
           echo "Build & Test: ${{ needs.build-and-test.result }}"
           echo "Security Check: ${{ needs.security-check.result }}"
-          if [[ "${{ needs.code-quality.result }}" == "failure" || "${{ needs.build-and-test.result }}" == "failure" ]]; then
+          if [[ "${{ needs.code-quality.result }}" == "failure" || "${{ needs.build-and-test.result }}" == "failure" || "${{ needs.security-check.result }}" == "failure" ]]; then
             echo "❌ CI Failed"
             exit 1
           else
