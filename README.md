@@ -8,11 +8,10 @@
 - **pnpm** как пакетный менеджер
 - **SWC** для быстрой сборки и трансформации
 - **ESLint + Prettier** с настроенными правилами
-- **Jest** для тестирования с поддержкой TypeScript
+- **Vitest** для тестирования с поддержкой TypeScript
 - **Husky** с pre-commit и commit-msg хуками
 - **Conventional Commits** через CommitLint
 - **GitHub Actions** CI/CD pipeline
-- **Nodemon** для разработки с hot reload
 
 ---
 
